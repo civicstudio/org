@@ -1,0 +1,406 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+  american,
+  letterpaper,
+  11pt]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{setspace}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\ifLuaTeX
+\usepackage[bidi=basic,shorthands=off]{babel}
+\else
+\usepackage[bidi=default,shorthands=off]{babel}
+\fi
+\ifLuaTeX
+  \usepackage{selnolig} % disable illegal ligatures
+\fi
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue
+}
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyhead[R]{\small Version 0.2.0 · Draft for review}%
+  \fancyfoot[C]{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+\pagestyle{plain}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Shared Context from Public Meetings},
+  pdfauthor={Ryan Wold · ryan@civic.studio},
+  pdflang={en-US},
+  pdfsubject={Civic Technology},
+  pdfkeywords={public meetings, civic technology, local government, speech recognition, speaker diarization, linked data, open data, provenance},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Shared Context from Public Meetings}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Distilling Public Meetings into Typed and Linked Data}
+\author{Ryan Wold · \href{mailto:ryan@civic.studio}{\nolinkurl{ryan@civic.studio}}}
+\date{November 11, 2026}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Local governments decide in public, and almost all of the context for those decisions is on the record: hours of meeting video, agendas without times, roll calls, staff reports and minutes.
+That context is rarely connected.
+Projects, budgets, programs, departments and expenditures come up repeatedly across meetings and months.
+The connections between those mentions are real, but they are implicit, held in the memory of the people who were in the room.
+We describe a method that makes that connective context explicit and keeps it, by treating a meeting and its supporting materials as data in three forms.
+(1) The raw form is what the city publishes, kept as published.
+(2) The typed form is a set of records, each anchored to a second of the recording and carrying its source, confidence and review status.
+(3) The linked form gives the real-world things a meeting refers to an identity that holds across meetings and years, so each new mention joins the ones before it.
+Machines do most of the work of moving between forms, and a person confirms what will be shown publicly.
+Applied to seven meetings of one municipal commission (about 130,000 words in session), the method placed 163 of 168 agenda items on the recording from speech alone and threaded a park project across all seven meetings.
+We argue that this work pays a coordination cost once and keeps the resulting context visible, which should make public decisions better informed.
+\end{abstract}
+
+\setstretch{1.15}
+\subsection*{Executive Summary}\label{executive-summary}
+\addcontentsline{toc}{subsection}{Executive Summary}
+
+A city decides in public, and the record of those decisions is mostly a recording that nobody opens again.
+GovCenter, a research project by Civic Studio, distills each public meeting and its supporting materials into data that people and tools can use.
+Every fact is tied to a second of the recording, says where it came from, and says whether a person has confirmed it.
+On seven meetings of one commission, the agenda was placed on the recording from speech alone for 97\% of items, and a park project was followed across fourteen months without anyone writing its history by hand.
+
+\section{Introduction}\label{introduction}
+
+Public meetings are where local government reasons out loud.
+A commission hears a park plan in March, revisits it in May and votes in June.
+Each time, staff, officials and residents bring what they remember to the room.
+The record holds more than anyone remembers, but finding it means scrubbing hours of video and cross-reading agendas and staff reports by hand.
+
+That work is a coordination cost.
+When nobody pays it, each decision is made with less context than already exists.
+When one person pays it privately, the context they build disappears into their notes.
+
+This paper asks a narrow question: can a meeting and its papers be distilled, mostly by machine and confirmed by a person, into metadata robust enough that other people and other tools can use it?
+We give ``usable'' a test.
+Every fact must cite a second of the recording, name its source, and carry its review status.
+
+\section{Three Forms of One Meeting}\label{three-forms-of-one-meeting}
+
+We treat a meeting as data in three forms.
+Each form is kept, and each points back to the form below it.
+
+{\def\LTcaptype{} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Form
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What it is
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Examples
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Raw & What the city publishes, kept exactly as published & Recording, agenda, roll call, staff reports, minutes \\
+Typed & Records anchored to a second, each with source, confidence and status & Transcript lines, voice turns, names and roles, timed agenda items, clips, votes \\
+Linked & Real-world things with an identity across meetings and years & Projects, budgets, programs, departments, expenditures, seats \\
+\end{longtable}
+}
+
+Raw is the evidence.
+Typed makes one meeting navigable.
+Linked makes many meetings into a history of what a city is actually doing.
+
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={One meeting, taken apart: raw, typed, linked. Parks and Recreation Commission, Vacaville, California, June 3, 2026.}]{figures/meeting-parts.png}
+\caption{One meeting, taken apart: raw, typed, linked. Parks and Recreation Commission, Vacaville, California, June 3, 2026.}
+\end{figure}
+
+\section{Inputs}\label{inputs}
+
+The method uses only what the city already publishes.
+
+{\def\LTcaptype{} % do not increment counter
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Input & What it carries \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Recording & Everything that was said, untimed and unlabeled \\
+Agenda & Item numbers and titles, in order, without times \\
+Roll call & Who sits on the body, and in which seat \\
+Staff reports & The detail behind an item, linked from the agenda \\
+Earlier meetings & Who spoke before and what was heard before \\
+\end{longtable}
+}
+
+No outside news, social media or commercial data is used.
+In the study city, Vacaville, California, recordings and agendas came from Granicus until May 2026 and from eScribe after.
+
+\section{Method}\label{method}
+
+The passes run in order, and each can be re-run without losing human work.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Collect.}
+  Discover each meeting on the city's portal and download its recording and agenda.
+\item
+  \textbf{Transcribe.}
+  Speech recognition (Whisper) produces lines stamped with their start and end seconds.
+\item
+  \textbf{Window.}
+  Find the meeting inside the recording, from the call to order to the adjournment after which meeting talk stops.
+  Recordings often continue for hours after a meeting ends.
+\item
+  \textbf{Separate voices.}
+  Speaker diarization splits the meeting into anonymous voices and turns.
+\item
+  \textbf{Name voices.}
+  Propose a name for each voice from what is said in the room (``my name is'', ``we will hear from'', ``good evening, Vice Chair''), and resolve spellings and roles against the roll call.
+  Each voice also gets a signature, so a name confirmed in one meeting is suggested for the same voice in others.
+\item
+  \textbf{Place the agenda.}
+  Score each agenda item's title words against the transcript, weighted by rarity within the meeting and by spoken hand-offs (``next we have''), and place items strictly in agenda order.
+  An item never spoken is placed by interpolation with confidence zero.
+\item
+  \textbf{Cut clips and find votes.}
+  Each item becomes a clip.
+  A vote is anchored where it is called (``all those in favor'') or its result stated (``motion carries'').
+\item
+  \textbf{Thread topics.}
+  Distinctive phrases from agenda titles are found in other meetings' agendas and transcripts, and kept when they recur.
+\item
+  \textbf{Confirm.}
+  A person confirms, corrects or rejects each suggestion before it is shown publicly.
+\end{enumerate}
+
+Every typed record carries three fields.
+\emph{Source} says how it was made: transcript, cue, voice, roster, interpolated or manual.
+\emph{Confidence} is a number when a machine made it.
+\emph{Status} is suggested, confirmed or rejected, and a re-run never overwrites a person's decision.
+
+The method holds to six rules.
+The city's record is the only source.
+Say only what was said: a vote is ``carried'' or ``failed'' only when someone said so, and tallies are not guessed from a chorus of ayes.
+Machine output is a suggestion until a person confirms it.
+Confirm once: a confirmed voice is recognized in later meetings.
+Keep the gaps: an unspoken item is marked as interpolated, not hidden.
+Name officials and staff, not members of the public, who are shown as ``Public speaker'' while the transcript keeps what they said.
+
+\section{Evaluation}\label{evaluation}
+
+We applied the method to the seven meetings of the Vacaville Parks and Recreation Commission in which one project, Unity Meadows Park, was discussed, from June 2025 to August 2026.
+Counts are from the record on November 2, 2026.
+Words are counted inside the meeting window; ``from speech'' counts agenda items placed from the transcript, and votes are machine suggestions awaiting confirmation.
+
+{\def\LTcaptype{} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.2034}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1356}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1017}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1017}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1186}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1186}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1017}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1186}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Meeting
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Words
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Voices
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Turns
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Items
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+From speech
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Clips
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Votes
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2025-06-04 & 31,411 & 18 & 464 & 26 & 26 & 19 & 3 \\
+2026-02-04 & 17,507 & 23 & 449 & 22 & 22 & 16 & 4 \\
+2026-03-04 & 7,361 & 12 & 154 & 22 & 22 & 16 & 3 \\
+2026-04-01 & 21,326 & 21 & 415 & 26 & 26 & 20 & 5 \\
+2026-05-06 & 28,735 & 27 & 567 & 30 & 27 & 23 & 3 \\
+2026-06-03 & 9,109 & 12 & 191 & 19 & 18 & 15 & 3 \\
+2026-08-05 & 14,456 & 17 & 262 & 23 & 22 & 20 & 2 \\
+\textbf{Total} & \textbf{129,905} & & \textbf{2,502} & \textbf{168} & \textbf{163} & \textbf{129} & \textbf{23} \\
+\end{longtable}
+}
+
+Four of the seven recordings are about six hours long, although no meeting ran longer than about three and a half; the channel kept recording after adjournment.
+
+We checked a subset by hand.
+On June 3, 2026, every spoken agenda item was placed within 30 seconds of its true start.
+On the same meeting, six of eleven voices were named from what was said, all correctly; the cues also caught that the vice chair presided while the chair arrived late.
+Voice signatures scored 0.81 to 0.98 for the same person across meetings and a median of 0.14 for different people.
+Three names confirmed on June 3 were suggested correctly for eleven voices in nine other meetings.
+The topic thread for Unity Meadows found a meeting (March 4, 2026) that had not been selected for the study, from its transcript alone.
+
+\section{Findings}\label{findings}
+
+\textbf{The agenda is the skeleton.}
+An untimed agenda and a transcript together yield a timed table of contents for nearly every item.
+It is the single most valuable input.
+
+\textbf{The recording is not the meeting.}
+Finding the meeting window first keeps hours of unrelated programming out of every later count.
+
+\textbf{Voices are a stronger identity than words.}
+Speech recognition misspells names; a voice signature does not.
+Confirming a person once and carrying the voice forward makes naming an archive inexpensive.
+
+\textbf{The roll call is a roster.}
+It resolves roles and spellings that the transcript gets wrong.
+
+\textbf{Votes can be found, but not counted.}
+The call and the stated result are reliable anchors.
+The motion's wording and the tally are not, and filler such as ``so moved'' must be dropped as a motion.
+
+\textbf{Threads are the payoff.}
+One meeting becomes a record.
+The same project found across a year of meetings becomes a story nobody had to write.
+
+\textbf{A person in the loop is the product, not a cost.}
+Confirmation is fast because the machine has already proposed an answer with its evidence quoted.
+
+\section{Toward Linked Data}\label{toward-linked-data}
+
+A meeting is a container, and the things it discusses outlive it.
+Today, threads are phrases found in agendas and transcripts.
+The next step is identity: one record for each project, budget, program and expenditure, linked to the city's own identifiers where they exist, so that a renamed park or ``the master plan'' still resolves to the same thing.
+
+{\def\LTcaptype{} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Thing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Example from the record
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Status
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Project & Unity Meadows Neighborhood Park, a 6.16-acre site & Threaded by name \\
+Budget & ``Almost \$1.9 million for Unity Meadows'' (June 2025) & In the transcript \\
+Grant or expenditure & ``Three grants that are funding various programs'' (August 2026) & In the transcript \\
+Program & Early Childhood Enrichment and Gymnastic Programs (August 2026) & An agenda item \\
+Seat & Chair, vice chair and commissioners, from the roll call & Named and confirmed \\
+\end{longtable}
+}
+
+Bodies, positions and people are drawn from Jurisdictional.org, a public inventory of U.S. governments, and enriched records can be contributed back.
+
+\section{Discussion: Crystallizing Attention}\label{discussion-crystallizing-attention}
+
+Attention is the scarce input to public decisions.
+Each time someone traces a project back through the record, they pay a coordination cost, and the result is usually a memo, a memory or nothing at all.
+
+The approach described here keeps the result.
+A confirmed name, a timed agenda item or a link between two meetings is paid for once and stays visible to everyone after.
+Attention spent on the record accumulates instead of evaporating.
+
+Our hope is modest and testable.
+Decisions made with the full history in view should be better informed, and over time, better.
+Measuring that is future work.
+
+\section{Limits}\label{limits}
+
+The study covers one body in one city.
+Topics are phrases, not entities.
+Staff reports are linked but not yet read.
+Minutes are not yet compared with the recording.
+Diarization sometimes splits one person into two voices.
+Older meetings were transcribed with an earlier setup and are noisier.
+
+\section{Future Work}\label{future-work}
+
+We plan to repeat the method on a city council, whose meetings are longer and denser; to compare approved minutes with the recording and classify where they differ; to read staff reports for the projects, places and dollar figures that phrase threads miss; to measure the person-minutes needed to confirm one meeting; and to publish the typed and linked record in a documented schema that another tool can use without asking us what it means.
+
+\end{document}

@@ -1,0 +1,60 @@
+---
+title: "Shared Context from Public Meetings"
+subtitle: "Distilling Public Meetings into Typed and Linked Data"
+author: "Ryan Wold · [ryan@civic.studio](mailto:ryan@civic.studio)"
+authors:
+  - name: Ryan Wold
+    affiliation: Civic Studio
+    email: ryan@civic.studio
+date: "November 11, 2026"
+abstract: |
+  Local governments decide in public, and almost all of the context for those decisions is on the record: hours of meeting video, agendas without times, roll calls, staff reports and minutes.
+  That context is rarely connected.
+  Projects, budgets, programs, departments and expenditures come up repeatedly across meetings and months.
+  The connections between those mentions are real, but they are implicit, held in the memory of the people who were in the room.
+  We describe a method that makes that connective context explicit and keeps it, by treating a meeting and its supporting materials as data in three forms.
+  (1) The raw form is what the city publishes, kept as published.
+  (2) The typed form is a set of records, each anchored to a second of the recording and carrying its source, confidence and review status.
+  (3) The linked form gives the real-world things a meeting refers to an identity that holds across meetings and years, so each new mention joins the ones before it.
+  Machines do most of the work of moving between forms, and a person confirms what will be shown publicly.
+  Applied to seven meetings of one municipal commission (about 130,000 words in session), the method placed 163 of 168 agenda items on the recording from speech alone and threaded a park project across all seven meetings.
+  We argue that this work pays a coordination cost once and keeps the resulting context visible, which should make public decisions better informed.
+keywords:
+  - public meetings
+  - civic technology
+  - local government
+  - speech recognition
+  - speaker diarization
+  - linked data
+  - open data
+  - provenance
+documentclass: article
+classoption:
+  - 11pt
+papersize: letter
+geometry:
+  - margin=1in
+indent: true
+linestretch: 1.15
+numbersections: true
+toc: false
+subject: "Civic Technology"
+lang: en-US
+header-includes: |
+  \usepackage{graphicx}
+  \usepackage{booktabs}
+  \usepackage{hyperref}
+  \hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+  }
+  \usepackage{fancyhdr}
+  \fancypagestyle{plain}{%
+    \fancyhf{}%
+    \fancyhead[R]{\small Version 0.2.0 · Draft for review}%
+    \fancyfoot[C]{\thepage}%
+    \renewcommand{\headrulewidth}{0pt}%
+  }
+  \pagestyle{plain}
+---
