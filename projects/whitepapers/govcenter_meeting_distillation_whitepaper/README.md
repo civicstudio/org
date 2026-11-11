@@ -56,15 +56,28 @@ In the study city, Vacaville, California, recordings and agendas came from Grani
 
 The passes run in order, and each can be re-run without losing human work.
 
-1. **Collect.** Discover each meeting on the city's portal and download its recording and agenda.
-2. **Transcribe.** Speech recognition (Whisper) produces lines stamped with their start and end seconds.
-3. **Window.** Find the meeting inside the recording, from the call to order to the adjournment after which meeting talk stops. Recordings often continue for hours after a meeting ends.
-4. **Separate voices.** Speaker diarization splits the meeting into anonymous voices and turns.
-5. **Name voices.** Propose a name for each voice from what is said in the room ("my name is", "we will hear from", "good evening, Vice Chair"), and resolve spellings and roles against the roll call. Each voice also gets a signature, so a name confirmed in one meeting is suggested for the same voice in others.
-6. **Place the agenda.** Score each agenda item's title words against the transcript, weighted by rarity within the meeting and by spoken hand-offs ("next we have"), and place items strictly in agenda order. An item never spoken is placed by interpolation with confidence zero.
-7. **Cut clips and find votes.** Each item becomes a clip. A vote is anchored where it is called ("all those in favor") or its result stated ("motion carries").
-8. **Thread topics.** Distinctive phrases from agenda titles are found in other meetings' agendas and transcripts, and kept when they recur.
-9. **Confirm.** A person confirms, corrects or rejects each suggestion before it is shown publicly.
+1. **Collect.**
+   Discover each meeting on the city's portal and download its recording and agenda.
+2. **Transcribe.**
+   Speech recognition (Whisper) produces lines stamped with their start and end seconds.
+3. **Window.**
+   Find the meeting inside the recording, from the call to order to the adjournment after which meeting talk stops.
+   Recordings often continue for hours after a meeting ends.
+4. **Separate voices.**
+   Speaker diarization splits the meeting into anonymous voices and turns.
+5. **Name voices.**
+   Propose a name for each voice from what is said in the room ("my name is", "we will hear from", "good evening, Vice Chair"), and resolve spellings and roles against the roll call.
+   Each voice also gets a signature, so a name confirmed in one meeting is suggested for the same voice in others.
+6. **Place the agenda.**
+   Score each agenda item's title words against the transcript, weighted by rarity within the meeting and by spoken hand-offs ("next we have"), and place items strictly in agenda order.
+   An item never spoken is placed by interpolation with confidence zero.
+7. **Cut clips and find votes.**
+   Each item becomes a clip.
+   A vote is anchored where it is called ("all those in favor") or its result stated ("motion carries").
+8. **Thread topics.**
+   Distinctive phrases from agenda titles are found in other meetings' agendas and transcripts, and kept when they recur.
+9. **Confirm.**
+   A person confirms, corrects or rejects each suggestion before it is shown publicly.
 
 Every typed record carries three fields.
 *Source* says how it was made: transcript, cue, voice, roster, interpolated or manual.
@@ -173,8 +186,3 @@ Older meetings were transcribed with an earlier setup and are noisier.
 # Future Work
 
 We plan to repeat the method on a city council, whose meetings are longer and denser; to compare approved minutes with the recording and classify where they differ; to read staff reports for the projects, places and dollar figures that phrase threads miss; to measure the person-minutes needed to confirm one meeting; and to publish the typed and linked record in a documented schema that another tool can use without asking us what it means.
-
-# Disclosure {-}
-
-The author is a member of the Vacaville Parks and Recreation Commission, whose meetings are studied here, and reviews that commission's records in GovCenter.
-Each published meeting of that commission carries this disclosure.
